@@ -43,6 +43,7 @@ cat gene_metadata <(awk  'NR>1{print $1}' AllGenesSmithSevero.txt) |sort -u -k1,
 vi cell_metadata #copied from excel
 cat cell_metadata <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26  |tr "\t" "\n" |awk '{print $1,"naive"}' |tr " " "\t") >Cell_metadata_Combine
 
+ less cell_metadata |awk 'NR<241' >Smithcell_metadata
 ```
 
 ### Smith only experiment
@@ -52,13 +53,13 @@ SmithAllGenes.txt
 cell_metadata
 AllGeneMetadata
 
-cut -f 2- SmithExpressionMatrix >SmithExpressionMatrix.noheaders
-awk 'NR>1' cell_metadata >cell_metadata.noheaders
+awk 'NR>1' SmithExpressionMatrix >SmithExpressionMatrix.noheaders
+
 # Load the data
 library(monocle3)
 library(dplyr)
-expression_matrix<- as.matrix("SmithExpressionMatrix",header = T,quote = "",row.names = 1)
-cell_metadata<- as.matrix("cell_metadata",header = T,quote = "",row.names = 1)
+expression_matrix<- as.matrix("SmithExpressionMatrixSparseHeadersIntact",header = T,quote = "",row.names = 1)
+cell_metadata<- as.matrix("RedoCellMetadata",header = T,quote = "",row.names = 1)
 gene_metadata <- as.matrix("AllGeneMetadata",header = T,quote = "",row.names = 1)
 
 cds <- new_cell_data_set(expression_matrix,
