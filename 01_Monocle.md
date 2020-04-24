@@ -1,4 +1,4 @@
-# SCRNAseq runthrough
+# SCRNAseq on mosquito hemocytes
 
 ## These are the files that need to made
 ```
@@ -52,7 +52,7 @@ WBGene00000005           aat-4
 ```
 
 
-### Create data tables for severin severin+severo analysis
+### Create data tables for smith smith+severo analysis
 ```
 #/work/gif/remkv6/Smith_Ryan/01_Monocle
 #transposed Severo and Smith datasets in excel to obtain these files
@@ -99,8 +99,6 @@ cat  <(awk 'NR==1' SmithOrigCellMetadata) <(awk 'NR==4' SeveroHemocyteRNAOrig.tx
 
 #create gene metadata, since they are not known
 less AllGenesSmithSeveroFormat.txt |cut -f 1|awk 'NR>1' |awk '{print $1"\tG"substr($1,6,length($1))}' >AllGeneMetadata
-
-
 ```
 
 
@@ -120,8 +118,9 @@ cds <- preprocess_cds(cds, num_dim = 10)
 cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
 plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_leaves=TRUE,label_cell_groups=FALSE,graph_label_size=2)
 ```
+![](assets/SmithOnlyPlot-1.png)
 
-### smith data pseudotime
+### Smith data pseudotime
 ```
 library(monocle3)
 library(dplyr)
@@ -139,11 +138,12 @@ cds <- learn_graph(cds)
 cds <- order_cells(cds)
 plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_cell_groups=FALSE,label_leaves=TRUE,graph_label_size=2,label_branch_points=TRUE)
 ```
+![](assets/SmithOnlyPseudotime-1.png)
 
 
 
 
-### smith + severo cell plot
+### Smith + severo cell plot
 ```
 #create appropriate files
 
@@ -163,12 +163,11 @@ cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
 cds <- cluster_cells(cds)
 plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_leaves=TRUE,label_cell_groups=FALSE,graph_label_size=2)
 ```
-![](images/SmithOnlyPlot-1.png)
-![](images/SmithOnlyPseudotime-1.png)
-![](images/SmithSeveroOnly-1.png)
-![](images/SmithSeveroPseudotime-1.png)
 
-### smith +severo pseudotime
+![](assets/SmithSeveroOnly-1.png)
+
+
+### Smith +severo pseudotime
 ```
 library(monocle3)
 library(dplyr)
@@ -186,6 +185,8 @@ cds <- cluster_cells(cds)
 cds <- learn_graph(cds)
 cds <- order_cells(cds)
 plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_cell_groups=FALSE,label_leaves=TRUE,graph_label_size=2,label_branch_points=TRUE)
-
-
 ```
+![](assets/SmithSeveroPseudotime-1.png)
+
+
+The Severo cells appear to group with Smith's group 6.  The pseudotime seems to indicate at least two different fates.
