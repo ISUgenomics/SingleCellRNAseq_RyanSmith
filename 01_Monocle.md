@@ -163,8 +163,10 @@ cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
 cds <- cluster_cells(cds)
 plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_leaves=TRUE,label_cell_groups=FALSE,graph_label_size=2)
 ```
-
-
+![](images/SmithOnlyPlot-1.png)
+![](images/SmithOnlyPseudotime-1.png)
+![](images/SmithSeveroOnly-1.png)
+![](images/SmithSeveroPseudotime-1.png)
 
 ### smith +severo pseudotime
 ```
