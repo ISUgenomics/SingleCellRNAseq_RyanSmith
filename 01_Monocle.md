@@ -1,84 +1,12 @@
 # SCRNAseq runthrough
 
-
-### Data
+## These are the files that need to made
 ```
-/work/gif/remkv6/Smith_Ryan/01_Monocle
-
-#transposed Severo and Smith datasets in excel to obtain these files
-
-SeveroHemocyteRNA.txt
-SmithHemocyteRNA.txt
-SmithHemocyteRNATransposePower2.txt #transposed, and inversed the log2 normalization
-SeveroHemocyteRNAOrig.txt
-
-
-#concatenate datasets, add missing genes to each dataset to create expression matrices
-awk 'NR>3' SeveroHemocyteRNAOrig.txt |cut -f -26 |cat - <(awk 'NR>5{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"} ' SmithHemocyteRNATransposePower2.txt |tr " " "\t" ) <(awk  '{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"}' AllGenesSmithSevero.txt |tr " " "\t")|sort -u -k 1,1 >SeveroAllGenes.txt
-
-
-awk 'NR>4' SmithHemocyteRNATransposePower2.txt |cat - <(awk 'NR>3{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"} ' SeveroHemocyteRNAOrig.txt |tr " " "\t" ) <(awk  '{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"}' AllGenesSmithSevero.txt |tr " " "\t")|sort -u -k 1,1 >SmithAllGenes.txt
-
-
-
-paste SeveroAllGenes.txt SmithAllGenes.txt |cut -f 1-26,28- >tailer.txt
-paste  <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26) <(awk 'NR==1' SmithHemocyteRNATransposePower2.txt )   >header.txt
-cat header.txt tailer.txt >AllGenesSmithSevero.txt
-
-cat <(awk 'NR==1' SmithHemocyteRNATransposePower2.txt ) SmithAllGenes.txt >SmithExpressionMatrix
-cat <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26) SeveroAllGenes.txt >SeveroExpressionMatrix
-
-```
-
-### Run Monocle for Smith data only, expected result 8 clusters?
-```
-
-#Create gene metadata from gff and missing genes added from studies
-wget ftp://ftp.ensemblgenomes.org/pub/release-46/metazoa/gff3/anopheles_gambiae/Anopheles_gambiae.AgamP4.46.gff3.gz
-
-less -S Anopheles_gambiae.AgamP4.46.gff3 |awk -F"\t" '$3=="gene"{print $9}' |sed 's/ID=gene://g' |sed 's/;/\t/1' >gene_metadata
-cat gene_metadata <(awk  'NR>1{print $1}' AllGenesSmithSevero.txt) |sort -u -k1,1 >AllGeneMetadata
-
-#cell metadata
-vi cell_metadata #copied from excel
-cat cell_metadata <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26  |tr "\t" "\n" |awk '{print $1,"naive"}' |tr " " "\t") >Cell_metadata_Combine
-
- less cell_metadata |awk 'NR<241' >Smithcell_metadata
-```
-
-### Smith only experiment
-
-```
-SmithAllGenes.txt
-cell_metadata
-AllGeneMetadata
-
-awk 'NR>1' SmithExpressionMatrix >SmithExpressionMatrix.noheaders
-
-# Load the data
-library(monocle3)
-library(dplyr)
-expression_matrix<- as.matrix("SmithExpressionMatrixSparseHeadersIntact",header = T,quote = "",row.names = 1)
-cell_metadata<- as.matrix("RedoCellMetadata",header = T,quote = "",row.names = 1)
-gene_metadata <- as.matrix("AllGeneMetadata",header = T,quote = "",row.names = 1)
-
-cds <- new_cell_data_set(expression_matrix,
-cell_metadata = cell_metadata,
-gene_metadata = gene_metadata)
-#Error: row.names of cell_metadata must be equal to colnames of expression_data
-#In addition: Warning message:
-#In storage.mode(from) <- "double" : NAs introduced by coercion
-
-#have tried removing the header and first column to make them equal, changed the first column of SmithExpressionMatrix from "cell" to "gene".  Nothing has gotten past this error
-
-Perhaps it needs to be space delimited?
-#downloaded rdf files from their tutorial, but not sure how to open.
-#They showt that you can import cell ranger objects, but the format there is not sensical to me and I do not have the reads to repeat.
 
 page(cell_metadata, method = "print")
  #################################################################################
  plate cao_cluster            cao_cell_type
-cele-001-001.CATGACTCAA   001          20     Unclassified neurons
+cele-001-001.CATGACTCAA   001          20     Unclassified neurons-
 cele-001-001.AAGACGGCCA   001           6                 Germline
 cele-001-001.GCCAACGCCA   001          13 Intestinal/rectal muscle
 cele-001-001.ATAGGAGTAC   001          27        Vulval precursors
@@ -93,7 +21,7 @@ cele-001-001.ATGCCGGACG   001          25      Non-seam hypodermis
 cele-001-001.AGCGGTAACG   001          11     Pharyngeal epithelia
 ###################################################################################
 
-
+#this ignores the header, so yes a header with nothing in col1,
  page(expression_matrix, method = "print")
 ###################################################################################
 20271 x 42035 sparse Matrix of class "dgCMatrix"
@@ -103,10 +31,6 @@ WBGene00000002 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  . 
 WBGene00000003 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  .  .  .  .  2  .
 WBGene00000004 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  .  .  .  .  .  .
 WBGene00000005 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  .  .  .  .  .  .
-WBGene00000006 .  .  . .  .  . 1  . .  . . .  . . . .  . .  .  .  .  .  .  .  2  .  .  .  .  .
-WBGene00000007 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  .  .  .  .  .  .
-WBGene00000008 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  .  .  .  .  .  .
-WBGene00000009 .  .  . .  .  . .  . .  . . .  . . . .  . .  .  .  .  .  .  .  .  .  .  .  .  .
 ###################################################################################
 
  page(gene_annotation, method = "print")
@@ -117,11 +41,6 @@ WBGene00000002           aat-1
 WBGene00000003           aat-2
 WBGene00000004           aat-3
 WBGene00000005           aat-4
-WBGene00000006           aat-5
-WBGene00000007           aat-6
-WBGene00000008           aat-7
-WBGene00000009           aat-8
-WBGene00000010           aat-9
 ############################################################################
 
 > dim(cell_metadata)
@@ -130,25 +49,141 @@ WBGene00000010           aat-9
 [1] 20271 42035
 > dim(gene_annotation)
 [1] 20271     1
-
-
-#So I need to format the
-
-
-pd <- new("AnnotatedDataFrame", data = HSMM_sample_sheet)
-fd <- new("AnnotatedDataFrame", data = HSSM_gene_annotation)
-HSMM <- new_cell_data_set(as.matrix(HSMM_expr_matrix), phenoData = pd, featureData = fd)
-# Make the CDS object
-cds <- new_cell_data_set(expression_matrix,
-cell_metadata = cell_metadata,
-gene_metadata = gene_annotation)
 ```
 
-### Smith +Severo experiment
+
+### Create data tables for severin severin+severo analysis
 ```
-AllGenesSmithSevero.txt
-Cell_metadata_Combine
-AllGeneMetadata
+#/work/gif/remkv6/Smith_Ryan/01_Monocle
+#transposed Severo and Smith datasets in excel to obtain these files
+SeveroHemocyteRNA.txt
+SmithHemocyteRNA.txt
+SmithHemocyteRNATransposePower2.txt #transposed, and inversed the log2 normalization
+SeveroHemocyteRNAOrig.txt
+
+cat <(awk 'NR>4{print $1}' SmithHemocyteRNATransposePower2.txt) <(awk 'NR>3{print $1}' SeveroHemocyteRNAOrig.txt) >AllGenesSmithSevero.txt
+
+#concatenate datasets, add missing genes to each dataset to create expression matrices
+awk 'NR>3' SeveroHemocyteRNAOrig.txt |cut -f -26 |cat - <(awk 'NR>5{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"} ' SmithHemocyteRNATransposePower2.txt |tr " " "\t" ) <(awk  '{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"}' AllGenesSmithSevero.txt |tr " " "\t")|sort -u -k 1,1 >SeveroAllGenes.txt
+
+
+awk 'NR>4' SmithHemocyteRNATransposePower2.txt |cat - <(awk 'NR>3{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"} ' SeveroHemocyteRNAOrig.txt |tr " " "\t" ) <(awk  '{print $1,"0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"}' AllGenesSmithSevero.txt |tr " " "\t") |sort -u -k 1,1 >SmithAllGenes.txt
+
+
+
+paste SeveroAllGenes.txt SmithAllGenes.txt |cut -f 1-26,28- |head -n -1 >tailer.txt
+paste  <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26 |sed 's/Gene IDs//g' ) <(awk 'NR==1' SmithHemocyteRNATransposePower2.txt |cut -f 2-)   >header.txt
+cat header.txt tailer.txt >AllGenesSmithSeveroFormat.txt
+
+#remove the gene id from header
+vi AllGenesSmithSeveroFormat.txt
+
+
+cat <(awk 'NR==1' SmithHemocyteRNATransposePower2.txt |cut -f 2- ) SmithAllGenes.txt |head -n -1>SmithExpressionMatrix
+vi SmithExpressionMatrix add the tab
+cat <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26) SeveroAllGenes.txt >SeveroExpressionMatrix
+
+#cannot have floating point numbers, so round.  Rounding eventually done in R
+#####awk '{for (i=1; i<=NF; i++) printf "%0.f %s", $i, (i==NF?RS:FS)}' SmithExpressionMatrix |cut -f 2- |paste <(awk '{print $1}' SmithExpressionMatrix) - |cat <(awk 'NR==1' SmithExpressionMatrix) - | awk 'NR>1{for (i=1; i<=NF; i++) printf "%0.f %s", $i, (i==NF?RS:FS)}' SmithExpressionMatrix |cut -f 2- |paste <(awk 'NR>1{print $1}' SmithExpressionMatrix) - |cat <(awk 'NR==1' SmithExpressionMatrix) - >SmithExpressionMatrix2
+
+
+#Get gene annotations Create gene to annotation mapping from gff
+wget ftp://ftp.ensemblgenomes.org/pub/release-46/metazoa/gff3/anopheles_gambiae/Anopheles_gambiae.AgamP4.46.gff3.gz
+less -S Anopheles_gambiae.AgamP4.46.gff3 |awk -F"\t" '$3=="gene"{print $9}' |sed 's/ID=gene://g' |sed 's/;/\t/1' >gene_annotations
+
+
+#cell metadata
+vi cell_metadata #copied from excel
+cat  <(awk 'NR==1' SmithOrigCellMetadata) <(awk 'NR==4' SeveroHemocyteRNAOrig.txt|cut -f -26  |tr "\t" "\n" |awk '{print $1,"naive","G9","9"}' |tr " " "\t") <(awk 'NR>1' SmithOrigCellMetadata) >Cell_metadata_Combine
+#deleted modify gene line vi Cell_metadata_Combine
+
+#create gene metadata, since they are not known
+less AllGenesSmithSeveroFormat.txt |cut -f 1|awk 'NR>1' |awk '{print $1"\tG"substr($1,6,length($1))}' >AllGeneMetadata
+
+
+```
+
+
+### Smith data only plot
+```
+library(monocle3)
+library(dplyr)
+library(Matrix)
+expression_matrix2<- round(as.matrix(read.table("SmithExpressionMatrix",header = T)))
+gene_metadata2 <- as.matrix(read.table("AllGeneMetadata",header = T,row.names = 1))
+cell_metadata2<- as.matrix(read.table("SmithOrigCellMetadata",header = T,row.names = 1))
+
+M1 <- as(expression_matrix2, "dgCMatrix")
+cds <- new_cell_data_set(M1,cell_metadata = cell_metadata2,gene_metadata = gene_metadata2)
+
+cds <- preprocess_cds(cds, num_dim = 10)
+cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
+plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_leaves=TRUE,label_cell_groups=FALSE,graph_label_size=2)
+```
+
+### smith data pseudotime
+```
+library(monocle3)
+library(dplyr)
+expression_matrix2<- round(as.matrix(read.table("SmithExpressionMatrix",header = T)))
+gene_metadata2 <- as.matrix(read.table("AllGeneMetadata",header = T,row.names = 1))
+cell_metadata2<- as.matrix(read.table("SmithOrigCellMetadata",header = T,row.names = 1))
+library(Matrix)
+M1 <- as(expression_matrix2, "dgCMatrix")
+cds <- new_cell_data_set(M1,cell_metadata = cell_metadata2,gene_metadata = gene_metadata2)
+
+cds <- preprocess_cds(cds, num_dim = 100)
+cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
+cds <- cluster_cells(cds)
+cds <- learn_graph(cds)
+cds <- order_cells(cds)
+plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_cell_groups=FALSE,label_leaves=TRUE,graph_label_size=2,label_branch_points=TRUE)
+```
+
+
+
+
+### smith + severo cell plot
+```
+#create appropriate files
+
+### Working model from Smith only data
+library(monocle3)
+library(dplyr)
+library(Matrix)
+expression_matrix2<- round(as.matrix(read.table("AllGenesSmithSeveroFormat.txt",header = T,row.names=1)))
+gene_metadata2 <- as.matrix(read.table("AllGeneMetadata",header = T,row.names = 1))
+cell_metadata2<- as.matrix(read.table("Cell_metadata_Combine",header = T,row.names = 1))
+
+M1 <- as(expression_matrix2, "dgCMatrix")
+cds <- new_cell_data_set(M1,cell_metadata = cell_metadata2,gene_metadata = gene_metadata2)
+
+cds <- preprocess_cds(cds, num_dim = 50)
+cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
+cds <- cluster_cells(cds)
+plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_leaves=TRUE,label_cell_groups=FALSE,graph_label_size=2)
+```
+
+
+
+### smith +severo pseudotime
+```
+library(monocle3)
+library(dplyr)
+library(Matrix)
+expression_matrix2<- round(as.matrix(read.table("AllGenesSmithSeveroFormat.txt",header = T,row.names=1)))
+gene_metadata2 <- as.matrix(read.table("AllGeneMetadata",header = T,row.names = 1))
+cell_metadata2<- as.matrix(read.table("Cell_metadata_Combine",header = T,row.names = 1))
+
+M1 <- as(expression_matrix2, "dgCMatrix")
+cds <- new_cell_data_set(M1,cell_metadata = cell_metadata2,gene_metadata = gene_metadata2)
+
+cds <- preprocess_cds(cds, num_dim = 50)
+cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
+cds <- cluster_cells(cds)
+cds <- learn_graph(cds)
+cds <- order_cells(cds)
+plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_cell_groups=FALSE,label_leaves=TRUE,graph_label_size=2,label_branch_points=TRUE)
 
 
 ```
