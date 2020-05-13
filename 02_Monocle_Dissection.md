@@ -385,6 +385,8 @@ plot_cells(cds, genes=c("G07788"), show_trajectory_graph=FALSE, cell_size = 0.55
 plot_cells(cds, genes=c("G07563"), show_trajectory_graph=FALSE, cell_size = 0.55, label_cell_groups=FALSE, label_leaves=FALSE)
 plot_cells(cds, genes=c("G06452"), show_trajectory_graph=FALSE, cell_size = 0.55, label_cell_groups=FALSE, label_leaves=FALSE)
 plot_cells(cds, genes=c("G03614"), show_trajectory_graph=FALSE, cell_size = 0.55, label_cell_groups=FALSE, label_leaves=FALSE)
+
+
 plot_cells(cds, genes=c("G01678"), show_trajectory_graph=FALSE, cell_size = 0.55, label_cell_groups=FALSE, label_leaves=FALSE)
 plot_cells(cds, genes=c("G00804"), show_trajectory_graph=FALSE, cell_size = 0.55, label_cell_groups=FALSE, label_leaves=FALSE)
 plot_cells(cds, genes=c("G00092"), show_trajectory_graph=FALSE, cell_size = 0.55, label_cell_groups=FALSE, label_leaves=FALSE)

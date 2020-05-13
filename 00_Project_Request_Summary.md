@@ -7,3 +7,9 @@ They have other data that negates the two cell type group's hypothesis in PNAS. 
 Because the data from Ryan's project is log normalized, and the data could be questionably different, we will perform 2 analyses.  1.  Monocle clustering with Ryan's data. 2. Monocle clustering of Ryan's data + 24 external samples.
 
 We were also tasked with performing a monocle pseudotime analysis with Ryan's data.
+
+May 05/04-07?/20
+1.  Use lineage 5 as root for just the smith data.
+2.  Remove all non-common genes and see how smith/severo cluster –expect those to be dispersed around, not clustering to a single spot.
+3.  Do severo data by themselves
+4.  Find genes with expression that define the populations.
