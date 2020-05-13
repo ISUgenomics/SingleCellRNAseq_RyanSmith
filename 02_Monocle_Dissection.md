@@ -244,7 +244,7 @@ less  -S SmithSeveroNormalized| sed 's/,/\t/g' |cut -f 1,8- |awk 'NR>1' |sort -k
 #fix the header to match col1 of nothing
  vi NormalizedSmithSeveroCounts4Monocle.tab
 ```
-#FIX ME DESEQ PCA
+#DESEQ PCA
 ![](assets/DESEQPCA-1.png)
 
 #### Run monocle to see if this normalized dataset accomplishes the clustering
@@ -277,7 +277,7 @@ plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,la
 
 ![](assets/DeseqNormMonocleplots-1.png)
 
-### Try to use upper quartile normalization on severo deata
+### Try to use upper quartile normalization on severo data
 
 ```
 # calculated upper quartile in excel, divided all values by their upper quartile and then averaged all of the upper quartile's and multiplied all all values by the mean of all upper quartile's.
@@ -405,10 +405,12 @@ agg_mat <- aggregate_gene_expression(cds, gene_module_df, cell_group_df)
 row.names(agg_mat) <- stringr::str_c("Module ", row.names(agg_mat))
 pheatmap::pheatmap(agg_mat, scale="column", clustering_method="ward.D2")
 
+ write.csv(gene_module_df, file="GeneModules",quote = FALSE,row.names = F)
+
 q()
 n
 mv Rplots.pdf SmithOnlyGeneExpression.pdf
-        
+
 ```
 
 ![](assets/SmithOnlyGeneExpression-01.png)
