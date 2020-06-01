@@ -440,3 +440,45 @@ mv Rplots.pdf SmithOnlyGeneExpression.pdf
 ![](assets/SmithOnlyGeneExpression-23.png)
 ![](assets/SmithOnlyGeneExpression-24.png)
 ![](assets/SmithOnlyGeneExpression-25.png)
+
+
+### Show progression of pseudotime via color
+```
+library(monocle3)
+library(dplyr)
+expression_matrix2<- round(as.matrix(read.table("SmithExpressionMatrix",header = T)))
+gene_metadata2 <- as.matrix(read.table("AllGeneMetadata",header = T,row.names = 1))
+cell_metadata2<- as.matrix(read.table("SmithOrigCellMetadata",header = T,row.names = 1))
+library(Matrix)
+M1 <- as(expression_matrix2, "dgCMatrix")
+cds <- new_cell_data_set(M1,cell_metadata = cell_metadata2,gene_metadata = gene_metadata2)
+
+cds <- preprocess_cds(cds, num_dim = 100)
+cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
+cds <- cluster_cells(cds)
+cds <- learn_graph(cds)
+cds <- order_cells(cds,root_cells=row.names(colData(cds[,3],on=5)))
+plot_cells(cds, reduction_method="UMAP", color_cells_by="pseudotime",cell_size=1.3,label_cell_groups=FALSE,label_leaves=FALSE,graph_label_size=2,label_branch_points=TRUE)
+```
+![](assets/PseudotimeColorGradient-1)
+
+### Pseudotime rooting test to cluster 2
+```
+
+library(monocle3)
+library(dplyr)
+expression_matrix2<- round(as.matrix(read.table("SmithExpressionMatrix",header = T)))
+gene_metadata2 <- as.matrix(read.table("AllGeneMetadata",header = T,row.names = 1))
+cell_metadata2<- as.matrix(read.table("SmithOrigCellMetadata",header = T,row.names = 1))
+library(Matrix)
+M1 <- as(expression_matrix2, "dgCMatrix")
+cds <- new_cell_data_set(M1,cell_metadata = cell_metadata2,gene_metadata = gene_metadata2)
+
+cds <- preprocess_cds(cds, num_dim = 100)
+cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
+cds <- cluster_cells(cds)
+cds <- learn_graph(cds)
+cds <- order_cells(cds,root_cells=row.names(colData(cds[,3],on=5)))
+plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_cell_groups=FALSE,label_leaves=TRUE,graph_label_size=2,label_branch_points=TRUE)
+```
+![](assets/Rooted2Test-1)

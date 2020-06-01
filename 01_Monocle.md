@@ -104,6 +104,7 @@ less AllGenesSmithSeveroFormat.txt |cut -f 1|awk 'NR>1' |awk '{print $1"\tG"subs
 
 ### Smith data only plot
 ```
+install.packages("uwot")
 library(monocle3)
 library(dplyr)
 library(Matrix)
