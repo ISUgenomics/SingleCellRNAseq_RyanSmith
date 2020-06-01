@@ -460,7 +460,7 @@ cds <- learn_graph(cds)
 cds <- order_cells(cds,root_cells=row.names(colData(cds[,3],on=5)))
 plot_cells(cds, reduction_method="UMAP", color_cells_by="pseudotime",cell_size=1.3,label_cell_groups=FALSE,label_leaves=FALSE,graph_label_size=2,label_branch_points=TRUE)
 ```
-![](assets/PseudotimeColorGradient-1)
+![](assets/PseudotimeColorGradient-1.png)
 
 ### Pseudotime rooting test to cluster 2
 ```
@@ -481,4 +481,4 @@ cds <- learn_graph(cds)
 cds <- order_cells(cds,root_cells=row.names(colData(cds[,3],on=5)))
 plot_cells(cds, reduction_method="UMAP", color_cells_by="group",cell_size=1.3,label_cell_groups=FALSE,label_leaves=TRUE,graph_label_size=2,label_branch_points=TRUE)
 ```
-![](assets/Rooted2Test-1)
+![](assets/Rooted2Test-1.png)
