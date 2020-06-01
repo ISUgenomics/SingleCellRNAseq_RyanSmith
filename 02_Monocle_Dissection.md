@@ -457,8 +457,24 @@ cds <- preprocess_cds(cds, num_dim = 100)
 cds <- reduce_dimension(cds,reduction_method=c("UMAP"))
 cds <- cluster_cells(cds)
 cds <- learn_graph(cds)
-cds <- order_cells(cds,root_cells=row.names(colData(cds[,3],on=5)))
+
+#set the root for the gradient
+get_earliest_principal_node <- function(cds,on=5){
+  cell_ids <- which(colData(cds)[, "group"] == 5)
+
+  closest_vertex <-
+  cds@principal_graph_aux[["UMAP"]]$pr_graph_cell_proj_closest_vertex
+  closest_vertex <- as.matrix(closest_vertex[colnames(cds), ])
+  root_pr_nodes <-
+  igraph::V(principal_graph(cds)[["UMAP"]])$name[as.numeric(names
+  (which.max(table(closest_vertex[cell_ids,]))))]
+
+  root_pr_nodes
+}
+cds <- order_cells(cds, root_pr_nodes=get_earliest_principal_node(cds))
+
 plot_cells(cds, reduction_method="UMAP", color_cells_by="pseudotime",cell_size=1.3,label_cell_groups=FALSE,label_leaves=FALSE,graph_label_size=2,label_branch_points=TRUE)
+
 ```
 ![](assets/PseudotimeColorGradient-1.png)
 
