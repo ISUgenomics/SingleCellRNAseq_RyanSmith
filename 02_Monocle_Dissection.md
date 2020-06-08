@@ -352,7 +352,7 @@ plot_cells(cds, genes=gene_module_df,
            show_trajectory_graph=FALSE,
            label_cell_groups=FALSE)     
 
-#16-18 gene modules in the 8 Cell clusters... #not the variable names are meaningless, just copies of tutorial script
+#16-18 gene modules in the 8 Cell clusters... #note the variable names are meaningless, just copies of tutorial script
 
 ciliated_cds_pr_test_res <- graph_test(cds, neighbor_graph="principal_graph", cores=1)
 pr_deg_ids <- row.names(subset(ciliated_cds_pr_test_res, q_value < 0.05))
